@@ -30,7 +30,7 @@
 ## 🚀 快速开始
 
 ### 环境要求
-- JDK 17+
+- JDK 17+(推荐25)
 - Node.js 18+
 - Maven (或使用 IDE 内置)
 
@@ -71,23 +71,6 @@ VALUES ('admin', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iKTVKIUi',
 ```
 默认密码：`admin123`
 
-## 📁 项目结构简览
-
-```
-.
-├── backend/                     # Spring Boot 后端
-│   ├── src/main/java/...        # Controller, Service, Repository
-│   └── src/main/resources/      # application.properties, schema.sql
-├── frontend/                    # Vue 3 前端
-│   ├── src/
-│   │   ├── api/                 # Axios 请求封装
-│   │   ├── components/          # 可复用组件
-│   │   ├── stores/              # Pinia 状态管理
-│   │   ├── views/               # 页面
-│   │   └── style/               # CSS 变量与全局样式
-│   └── package.json
-└── README.md
-```
 
 ## ⚙️ 配置说明
 
@@ -113,7 +96,6 @@ server.port=8080
 
 ## 📝 API 文档参考
 
-详细接口文档位于 `docs/` 目录（或见项目内 Markdown）：
 - 管理员接口 (`/api/admin/*`)
 - 用户接口 (`/api/users/*`)
 - 算子 (`/api/operators`)
@@ -134,5 +116,3 @@ server.port=8080
 MIT License
 
 ---
-
-**Enjoy building your own operator assembly community!**
