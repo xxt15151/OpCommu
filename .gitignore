@@ -1,0 +1,42 @@
+# ==================== 操作系统 & 通用临时文件 ====================
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.swp
+*~
+desktop.ini
+
+# ==================== IDE & 编辑器配置 ====================
+# .vscode/
+.idea/
+*.iml
+.project
+.classpath
+.settings/
+
+# ==================== Java / Maven 模块 (demo/) ====================
+demo/target/
+demo/*.class
+demo/*.jar
+demo/*.war
+demo/*.ear
+demo/*.zip
+demo/*.tar.gz
+demo/*.rar
+demo/.mvn/wrapper/maven-wrapper.jar
+
+# ==================== Vue / Vite 模块 (vuedemo/MatchingSystem/) ====================
+vuedemo/MatchingSystem/node_modules/
+vuedemo/MatchingSystem/dist/
+vuedemo/MatchingSystem/.vite/
+vuedemo/MatchingSystem/npm-debug.log*
+vuedemo/MatchingSystem/yarn-debug.log*
+vuedemo/MatchingSystem/yarn-error.log*
+vuedemo/MatchingSystem/pnpm-debug.log*
+
+# 环境变量（保留 .env 作为默认示例，忽略本地/敏感配置）
+vuedemo/MatchingSystem/.env.local
+vuedemo/MatchingSystem/.env.*.local
+vuedemo/MatchingSystem/.env.production.local
+vuedemo/MatchingSystem/.env.development.local

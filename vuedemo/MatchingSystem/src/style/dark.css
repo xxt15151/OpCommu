@@ -1,0 +1,16 @@
+/* 深色模式额外调整 */
+[data-theme="dark"] .model-card {
+  background-color: var(--surface-card);
+}
+
+[data-theme="dark"] .button-secondary {
+  background-color: transparent;
+  border-color: var(--hairline-strong);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .text-input {
+  background-color: var(--surface-card);
+  border-color: var(--hairline);
+  color: var(--ink);
+}

@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员控制台测试 - 装配计算器</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: system-ui, 'Segoe UI', monospace; background: #eef2f5; margin: 0; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        h1 { color: #2c3e50; border-left: 5px solid #e67e22; padding-left: 15px; }
+        .card { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 24px; padding: 20px; }
+        .card h3 { margin-top: 0; border-left: 4px solid #e67e22; padding-left: 12px; }
+        .flex-row { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
+        .flex-col { flex: 1; min-width: 280px; }
+        button { background: #e67e22; border: none; color: white; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 0.9rem; margin: 4px 4px 0 0; transition: 0.2s; }
+        button:hover { background: #d35400; }
+        input, textarea, select { padding: 8px; border: 1px solid #ccc; border-radius: 6px; width: 100%; margin-bottom: 10px; font-family: inherit; }
+        textarea { min-height: 80px; resize: vertical; }
+        .log-area { background: #1e1e2f; color: #f8f8f2; padding: 12px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 0.85rem; overflow-x: auto; max-height: 500px; }
+        .log-entry { margin-bottom: 8px; border-bottom: 1px solid #444; padding-bottom: 6px; word-break: break-all; }
+        .log-time { color: #86d9ff; }
+        .log-url { color: #ffd966; }
+        .log-status { color: #6fcf97; }
+        .log-error { color: #ff6b6b; }
+        hr { margin: 16px 0; }
+        .badge { background: #f39c12; color: #fff; padding: 2px 8px; border-radius: 20px; font-size: 0.8rem; display: inline-block; margin-bottom: 8px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        th, td { border: 1px solid #ddd; padding: 6px; text-align: left; }
+        th { background: #f2f2f2; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🔐 管理员控制台测试</h1>
+
+    <!-- 登录卡 -->
+    <div class="card">
+        <h3>👑 管理员登录</h3>
+        <div class="flex-row">
+            <div class="flex-col">
+                <label>用户名</label>
+                <input type="text" id="adminUsername" placeholder="admin" value="admin">
+                <label>密码</label>
+                <input type="password" id="adminPassword" placeholder="密码" value="admin123">
+                <button id="adminLoginBtn">登录</button>
+            </div>
+            <div class="flex-col">
+                <label>当前管理员ID (登录后自动填充)</label>
+                <input type="number" id="currentAdminId" readonly placeholder="未登录">
+                <label>当前管理员用户名</label>
+                <input type="text" id="currentAdminName" readonly placeholder="未登录">
+                <div class="badge">所有管理接口会自动携带 <code>X-Admin-Id</code></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 用户管理 -->
+    <div class="card">
+        <h3>👥 普通用户管理</h3>
+        <div class="flex-row">
+            <div class="flex-col">
+                <button id="listUsersBtn">📋 获取所有用户</button>
+                <div id="userListPanel" style="max-height: 300px; overflow-y: auto; margin-top: 10px; font-size: 0.8rem;"></div>
+            </div>
+            <div class="flex-col">
+                <label>创建用户</label>
+                <input type="text" id="newUsername" placeholder="用户名">
+                <input type="password" id="newPassword" placeholder="密码">
+                <input type="email" id="newEmail" placeholder="邮箱">
+                <select id="newRole">
+                    <option value="USER">USER</option>
+                    <option value="ADMIN">ADMIN</option>
+                </select>
+                <button id="createUserBtn">➕ 创建用户</button>
+                <hr>
+                <label>更新用户 (需提供ID)</label>
+                <input type="number" id="updateUserId" placeholder="用户ID">
+                <input type="text" id="updateUsername" placeholder="新用户名">
+                <input type="email" id="updateEmail" placeholder="新邮箱">
+                <select id="updateRole">
+                    <option value="USER">USER</option>
+                    <option value="ADMIN">ADMIN</option>
+                </select>
+                <button id="updateUserBtn">✏️ 更新用户</button>
+                <hr>
+                <label>删除用户</label>
+                <div style="display: flex; gap: 8px;">
+                    <input type="number" id="deleteUserId" placeholder="用户ID">
+                    <button id="deleteUserBtn">🗑️ 删除用户</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 算子管理 -->
+    <div class="card">
+        <h3>⚙️ 算子管理</h3>
+        <div class="flex-row">
+            <div class="flex-col">
+                <button id="listOperatorsBtn">📋 获取所有算子</button>
+                <div id="operatorListPanel" style="max-height: 300px; overflow-y: auto; margin-top: 10px; font-size: 0.8rem;"></div>
+            </div>
+            <div class="flex-col">
+                <label>创建算子</label>
+                <input type="text" id="opName" placeholder="算子名称">
+                <textarea id="opAttributes" placeholder="属性 (JSON字符串) 例如: {\"attack\":150,\"element\":\"fire\"}"></textarea>
+                <button id="createOperatorBtn">➕ 创建算子</button>
+                <hr>
+                <label>更新算子 (需提供ID)</label>
+                <input type="number" id="updateOpId" placeholder="算子ID">
+                <input type="text" id="updateOpName" placeholder="新名称">
+                <textarea id="updateOpAttributes" placeholder="新属性 (JSON字符串)"></textarea>
+                <button id="updateOperatorBtn">✏️ 更新算子</button>
+                <hr>
+                <label>删除算子</label>
+                <div style="display: flex; gap: 8px;">
+                    <input type="number" id="deleteOpId" placeholder="算子ID">
+                    <button id="deleteOperatorBtn">🗑️ 删除算子</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 日志 -->
+    <div class="card">
+        <h3>📡 请求与响应日志</h3>
+        <button id="clearLogBtn">清空日志</button>
+        <div id="logPanel" class="log-area">
+            <div class="log-entry">✨ 等待操作...</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API_BASE = 'http://localhost:8080/api';
+    let currentAdmin = { id: null, username: null };
+
+    // DOM 元素
+    const logPanel = document.getElementById('logPanel');
+    const adminLoginBtn = document.getElementById('adminLoginBtn');
+    const adminUsername = document.getElementById('adminUsername');
+    const adminPassword = document.getElementById('adminPassword');
+    const currentAdminIdSpan = document.getElementById('currentAdminId');
+    const currentAdminNameSpan = document.getElementById('currentAdminName');
+
+    const listUsersBtn = document.getElementById('listUsersBtn');
+    const userListPanel = document.getElementById('userListPanel');
+    const createUserBtn = document.getElementById('createUserBtn');
+    const updateUserBtn = document.getElementById('updateUserBtn');
+    const deleteUserBtn = document.getElementById('deleteUserBtn');
+
+    const listOperatorsBtn = document.getElementById('listOperatorsBtn');
+    const operatorListPanel = document.getElementById('operatorListPanel');
+    const createOperatorBtn = document.getElementById('createOperatorBtn');
+    const updateOperatorBtn = document.getElementById('updateOperatorBtn');
+    const deleteOperatorBtn = document.getElementById('deleteOperatorBtn');
+
+    const clearLogBtn = document.getElementById('clearLogBtn');
+
+    // 辅助函数：添加日志
+    function addLog(method, url, status, response, isError = false) {
+        const time = new Date().toLocaleTimeString();
+        const entry = document.createElement('div');
+        entry.className = 'log-entry';
+        const statusClass = status >= 200 && status < 300 ? 'log-status' : (status ? 'log-error' : '');
+        let responseStr = typeof response === 'object' ? JSON.stringify(response, null, 2) : String(response);
+        if (responseStr.length > 1000) responseStr = responseStr.substring(0, 1000) + '… (truncated)';
+        entry.innerHTML = `
+            <span class="log-time">[${time}]</span> 
+            <span class="log-url">${method} ${url}</span> 
+            <span class="${statusClass}">status: ${status || 'network error'}</span><br>
+            <span style="color:#ddd;">▶ response:</span> 
+            <pre style="margin:4px 0 0 0; white-space:pre-wrap; word-break:break-all;">${responseStr}</pre>
+        `;
+        if (isError) entry.style.borderLeft = '3px solid #ff6b6b';
+        logPanel.prepend(entry);
+        if (logPanel.children.length > 30) logPanel.removeChild(logPanel.lastChild);
+    }
+
+    async function fetchApi(path, options = {}) {
+        const url = API_BASE + path;
+        const method = options.method || 'GET';
+        const headers = {
+            'Content-Type': 'application/json',
+            ...options.headers
+        };
+        if (currentAdmin.id && (method === 'POST' || method === 'PUT' || method === 'DELETE')) {
+            headers['X-Admin-Id'] = currentAdmin.id;
+        }
+        const requestOptions = { method, headers, body: options.body };
+        try {
+            const response = await fetch(url, requestOptions);
+            let responseData;
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                responseData = await response.json();
+            } else {
+                responseData = await response.text();
+            }
+            addLog(method, path, response.status, responseData);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            return { ok: true, status: response.status, data: responseData };
+        } catch (err) {
+            addLog(method, path, err.status || 'ERR', err.message, true);
+            return { ok: false, error: err.message };
+        }
+    }
+
+    function updateAdminUI() {
+        currentAdminIdSpan.value = currentAdmin.id ?? '';
+        currentAdminNameSpan.value = currentAdmin.username ?? '';
+        const needAuthBtns = [listUsersBtn, createUserBtn, updateUserBtn, deleteUserBtn, listOperatorsBtn, createOperatorBtn, updateOperatorBtn, deleteOperatorBtn];
+        needAuthBtns.forEach(btn => btn.disabled = !currentAdmin.id);
+    }
+
+    // 管理员登录
+    async function adminLogin() {
+        const username = adminUsername.value.trim();
+        const password = adminPassword.value.trim();
+        if (!username || !password) {
+            alert('请输入用户名和密码');
+            return;
+        }
+        const res = await fetchApi('/admin/login', {
+            method: 'POST',
+            body: JSON.stringify({ username, password })
+        });
+        if (res.ok && res.data && res.data.id) {
+            currentAdmin = { id: res.data.id, username: res.data.username };
+            updateAdminUI();
+            addLog('POST', '/admin/login', res.status, res.data);
+            // 登录后自动刷新用户列表和算子列表
+            listUsers();
+            listOperators();
+        } else {
+            alert('登录失败，请检查管理员账号密码');
+        }
+    }
+
+    // 用户管理
+    async function listUsers() {
+        if (!currentAdmin.id) { alert('请先登录'); return; }
+        const res = await fetchApi('/admin/users');
+        if (res.ok && Array.isArray(res.data)) {
+            let html = '<table><tr><th>ID</th><th>用户名</th><th>邮箱</th><th>角色</th></tr>';
+            res.data.forEach(u => {
+                html += `<tr><td>${u.id}</td><td>${escapeHtml(u.username)}</td><td>${escapeHtml(u.email)}</td><td>${u.role}</td></tr>`;
+            });
+            html += '</table>';
+            userListPanel.innerHTML = html;
+        } else {
+            userListPanel.innerHTML = '<p>加载用户失败</p>';
+        }
+    }
+
+    async function createUser() {
+        if (!currentAdmin.id) { alert('请先登录'); return; }
+        const username = document.getElementById('newUsername').value.trim();
+        const password = document.getElementById('newPassword').value.trim();
+        const email = document.getElementById('newEmail').value.trim();
+        const role = document.getElementById('newRole').value;
+        if (!username || !password || !email) {
+            alert('用户名、密码、邮箱不能为空');
+            return;
+        }
+        const payload = { username, password, email, role };
+        const res = await fetchApi('/admin/users', { method: 'POST', body: JSON.stringify(payload) });
+        if (res.ok) {
+            alert('创建成功');
+            listUsers();
+        } else {
+            alert('创建失败');
+        }
+    }
+
+    async function updateUser() {
+        if (!currentAdmin.id) { alert('请先登录'); return; }
+        const id = document.getElementById('updateUserId').value;
+        const username = document.getElementById('updateUsername').value.trim();
+        const email = document.getElementById('updateEmail').value.trim();
+        const role = document.getElementById('updateRole').value;
+        if (!id || !username || !email) {
+            alert('用户ID、用户名、邮箱不能为空');
+            return;
+        }
+        const payload = { username, email, role };
+        const res = await fetchApi(`/admin/users/${id}`, { method: 'PUT', body: JSON.stringify(payload) });
+        if (res.ok) {
+            alert('更新成功');
+            listUsers();
+        } else {
+            alert('更新失败');
+        }
+    }
+
+    async function deleteUser() {
+        if (!currentAdmin.id) { alert('请先登录'); return; }
+        const id = document.getElementById('deleteUserId').value;
+        if (!id) { alert('请输入用户ID'); return; }
+        if (!confirm('确定删除该用户吗？')) return;
+        const res = await fetchApi(`/admin/users/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+            alert('删除成功');
+            listUsers();
+        } else {
+            alert('删除失败');
+        }
+    }
+
+    // 算子管理
+    async function listOperators() {
+        if (!currentAdmin.id) { alert('请先登录'); return; }
+        const res = await fetchApi('/admin/operators');
+        if (res.ok && Array.isArray(res.data)) {
+            let html = '<table><tr><th>ID</th><th>名称</th><th>属性</th></tr>';
+            res.data.forEach(op => {
+                html += `<tr><td>${op.id}</td><td>${escapeHtml(op.name)}</td><td><pre style="margin:0">${escapeHtml(op.attributes)}</pre></td></tr>`;
+            });
+            html += '</table>';
+            operatorListPanel.innerHTML = html;
+        } else {
+            operatorListPanel.innerHTML = '<p>加载算子失败</p>';
+        }
+    }
+
+    async function createOperator() {
+        if (!currentAdmin.id) { alert('请先登录'); return; }
+        const name = document.getElementById('opName').value.trim();
+        const attributes = document.getElementById('opAttributes').value.trim();
+        if (!name || !attributes) {
+            alert('名称和属性不能为空');
+            return;
+        }
+        // 验证 JSON 格式
+        try {
+            JSON.parse(attributes);
+        } catch(e) {
+            alert('属性必须是合法的 JSON 字符串');
+            return;
+        }
+        const payload = { name, attributes, createdBy: currentAdmin.id };
+        const res = await fetchApi('/admin/operators', { method: 'POST', body: JSON.stringify(payload) });
+        if (res.ok) {
+            alert('创建算子成功');
+            listOperators();
+        } else {
+            alert('创建失败');
+        }
+    }
+
+    async function updateOperator() {
+        if (!currentAdmin.id) { alert('请先登录'); return; }
+        const id = document.getElementById('updateOpId').value;
+        const name = document.getElementById('updateOpName').value.trim();
+        const attributes = document.getElementById('updateOpAttributes').value.trim();
+        if (!id || !name || !attributes) {
+            alert('算子ID、名称、属性不能为空');
+            return;
+        }
+        try {
+            JSON.parse(attributes);
+        } catch(e) {
+            alert('属性必须是合法的 JSON 字符串');
+            return;
+        }
+        const payload = { name, attributes };
+        const res = await fetchApi(`/admin/operators/${id}`, { method: 'PUT', body: JSON.stringify(payload) });
+        if (res.ok) {
+            alert('更新算子成功');
+            listOperators();
+        } else {
+            alert('更新失败');
+        }
+    }
+
+    async function deleteOperator() {
+        if (!currentAdmin.id) { alert('请先登录'); return; }
+        const id = document.getElementById('deleteOpId').value;
+        if (!id) { alert('请输入算子ID'); return; }
+        if (!confirm('确定删除该算子吗？')) return;
+        const res = await fetchApi(`/admin/operators/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+            alert('删除成功');
+            listOperators();
+        } else {
+            alert('删除失败');
+        }
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+            return c;
+        });
+    }
+
+    // 绑定事件
+    adminLoginBtn.onclick = adminLogin;
+    listUsersBtn.onclick = listUsers;
+    createUserBtn.onclick = createUser;
+    updateUserBtn.onclick = updateUser;
+    deleteUserBtn.onclick = deleteUser;
+    listOperatorsBtn.onclick = listOperators;
+    createOperatorBtn.onclick = createOperator;
+    updateOperatorBtn.onclick = updateOperator;
+    deleteOperatorBtn.onclick = deleteOperator;
+    clearLogBtn.onclick = () => { logPanel.innerHTML = '<div class="log-entry">✨ 日志已清空</div>'; };
+
+    // 初始按钮禁用
+    updateAdminUI();
+</script>
+</body>
+</html>

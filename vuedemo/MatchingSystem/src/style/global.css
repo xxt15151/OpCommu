@@ -1,0 +1,118 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--canvas);
+  color: var(--body);
+  line-height: 1.55;
+  font-weight: var(--font-light);
+  font-size: var(--text-body-md);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: var(--font-bold);
+  color: var(--ink);
+  line-height: 1.2;
+}
+
+h1 {
+  font-size: var(--text-display-xl);
+}
+
+h2 {
+  font-size: var(--text-display-lg);
+}
+
+h3 {
+  font-size: var(--text-display-md);
+}
+
+a {
+  text-decoration: none;
+  color: var(--ink);
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.container {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-xl);
+}
+
+.section {
+  padding: var(--spacing-section) 0;
+}
+
+/* 网格系统 */
+.grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-lg);
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-lg);
+}
+
+/* 响应式 */
+@media (max-width: 1024px) {
+  .grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .grid-4, .grid-2 {
+    grid-template-columns: 1fr;
+  }
+  
+  h1 {
+    font-size: 40px;
+  }
+  
+  .container {
+    padding: 0 var(--spacing-md);
+  }
+}
+
+/* 工具类 */
+.text-muted {
+  color: var(--muted);
+}
+
+.text-uppercase {
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-weight: var(--font-bold);
+  font-size: var(--text-label-uppercase);
+}
+
+/* 滚动条 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface-soft);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--hairline-strong);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
